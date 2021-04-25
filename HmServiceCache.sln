@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HmServiceCache.Master", "HmServiceCache.Master\HmServiceCache.Master.csproj", "{BA00660A-2380-433D-A2F6-64F56A25AB10}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HmServiceCache.Node", "HmServiceCache.Node\HmServiceCache.Node.csproj", "{3969D162-B967-493A-AA2E-CAC99CB134B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HmServiceCache.ClientConsoleApp", "HmServiceCache.ClientConsoleApp\HmServiceCache.ClientConsoleApp.csproj", "{ECF70F83-86E5-4793-B4A2-91C8CA080D16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HmServiceCache.Client", "HmServiceCache.Client\HmServiceCache.Client.csproj", "{EB332C59-66E6-4C66-95FB-47C9BE62E70E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HmServiceCache.Common", "HmServiceCache.Common\HmServiceCache.Common.csproj", "{F3DB55D6-1EF2-434F-A5B8-7F7509CD55DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HmServiceCache.Storage", "HmServiceCache.Storage\HmServiceCache.Storage.csproj", "{B42C2D2A-E15B-4F9C-AFA0-1ADF1F6E47BB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BA00660A-2380-433D-A2F6-64F56A25AB10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA00660A-2380-433D-A2F6-64F56A25AB10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA00660A-2380-433D-A2F6-64F56A25AB10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA00660A-2380-433D-A2F6-64F56A25AB10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3969D162-B967-493A-AA2E-CAC99CB134B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3969D162-B967-493A-AA2E-CAC99CB134B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3969D162-B967-493A-AA2E-CAC99CB134B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3969D162-B967-493A-AA2E-CAC99CB134B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECF70F83-86E5-4793-B4A2-91C8CA080D16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECF70F83-86E5-4793-B4A2-91C8CA080D16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECF70F83-86E5-4793-B4A2-91C8CA080D16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECF70F83-86E5-4793-B4A2-91C8CA080D16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB332C59-66E6-4C66-95FB-47C9BE62E70E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB332C59-66E6-4C66-95FB-47C9BE62E70E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB332C59-66E6-4C66-95FB-47C9BE62E70E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB332C59-66E6-4C66-95FB-47C9BE62E70E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3DB55D6-1EF2-434F-A5B8-7F7509CD55DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3DB55D6-1EF2-434F-A5B8-7F7509CD55DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3DB55D6-1EF2-434F-A5B8-7F7509CD55DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3DB55D6-1EF2-434F-A5B8-7F7509CD55DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B42C2D2A-E15B-4F9C-AFA0-1ADF1F6E47BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B42C2D2A-E15B-4F9C-AFA0-1ADF1F6E47BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B42C2D2A-E15B-4F9C-AFA0-1ADF1F6E47BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B42C2D2A-E15B-4F9C-AFA0-1ADF1F6E47BB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EF44A437-C649-4027-AC78-B62D08238B50}
+	EndGlobalSection
+EndGlobal

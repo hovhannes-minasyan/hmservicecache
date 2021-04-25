@@ -1,0 +1,23 @@
+#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
+WORKDIR /app
+EXPOSE 80
+
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+WORKDIR /src
+COPY ["HmServiceCache.Node/HmServiceCache.Node.csproj", "HmServiceCache.Node/"]
+COPY ["HmServiceCache.Storage/HmServiceCache.Storage.csproj", "HmServiceCache.Storage/"]
+COPY ["HmServiceCache.Common/HmServiceCache.Common.csproj", "HmServiceCache.Common/"]
+RUN dotnet restore "HmServiceCache.Node/HmServiceCache.Node.csproj"
+COPY . .
+WORKDIR "/src/HmServiceCache.Node"
+RUN dotnet build "HmServiceCache.Node.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "HmServiceCache.Node.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "HmServiceCache.Node.dll"]
