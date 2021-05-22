@@ -60,7 +60,6 @@ namespace HmServiceCache.Master.Controllers
             var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             dataStorage.AddToList(key, value, timeStamp);
             await ForwardRequest(timeStamp, value);
-
             return Ok();
         }
 
@@ -104,7 +103,6 @@ namespace HmServiceCache.Master.Controllers
 
             return Ok();
         }
-
 
         private async Task ForwardRequest(long timestamp, object value = null)
         {

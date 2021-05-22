@@ -89,14 +89,17 @@ namespace HmServiceCache.ClientConsoleApp
             await cache.AddToListAsync(listKey, 6);
             await cache.AddToListAsync(listKey, 7);
 
-            var list = await cache.GetListAsync<int>(listKey);
-
-            Console.WriteLine("Printing received list");
-            foreach (var item in list)
+            for (int i = 0; i < 10; i++)
             {
-                Console.Write(item + " ");
+                var list = await cache.GetListAsync<int>(listKey);
+
+                Console.WriteLine("Printing received list");
+                foreach (var item in list)
+                {
+                    Console.Write(item + " ");
+                }
+                Console.WriteLine();
             }
-            Console.WriteLine();
 
             var tempModel = new TempModel
             {
@@ -106,15 +109,23 @@ namespace HmServiceCache.ClientConsoleApp
 
             var listKey1 = "objList";
             await cache.AddToListAsync(listKey1, tempModel);
+            tempModel.A++;
             await cache.AddToListAsync(listKey1, tempModel);
+            tempModel.A++;
             await cache.AddToListAsync(listKey1, tempModel);
+            tempModel.A++;
             await cache.AddToListAsync(listKey1, tempModel);
 
-            var objList = await cache.GetListAsync<TempModel>(listKey1);
-            foreach (var item in objList)
+            for (int i = 0; i < 10; i++)
             {
-                Console.Write(item + " ");
+                var objList = await cache.GetListAsync<TempModel>(listKey1);
+                foreach (var item in objList)
+                {
+                    Console.Write(item + " ");
+                }
+                Console.WriteLine();
             }
+
             Console.WriteLine();
         }
     }

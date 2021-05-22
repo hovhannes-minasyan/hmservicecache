@@ -28,7 +28,9 @@ namespace HmServiceCache.Client.Services
             lock (connections) 
             {
                 Console.WriteLine("Taking connection at {0}", currentIndex);
-                return connections[currentIndex++];
+                var result = connections[currentIndex++];
+                currentIndex = currentIndex % configuration.PoolSize;
+                return result;
             }
         }
 

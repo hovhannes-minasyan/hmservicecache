@@ -8,21 +8,21 @@ namespace HmServiceCache.Storage.DataStructures
 {
     public class BaseDataStructure<T>
     {
-        //private ReaderWriterLock readerWriterLock = new ReaderWriterLock();
-
         private readonly ConcurrentDictionary<string, long> lastTimeStamps = new ConcurrentDictionary<string, long>();
-        private readonly ConcurrentDictionary<string, object> lockObjects = new ConcurrentDictionary<string, object>();
+        private readonly ConcurrentDictionary<string, ReaderWriterLock> lockObjects = new ConcurrentDictionary<string, ReaderWriterLock>();
         protected readonly ConcurrentDictionary<string, T> collection = new ConcurrentDictionary<string, T>();
 
         protected bool UpdateData(Func<bool> operation, long timeStamp, string key)
         {
-            object lockObj;
+            ReaderWriterLock lockObj;
             lock (lockObjects)
             {
                 lockObj = lockObjects.SafeKey(key);
             }
 
-            lock (lockObj)
+            lockObj.AcquireWriterLock(TimeSpan.FromSeconds(30));
+
+            try
             {
                 if (lastTimeStamps.GetValueOrDefault(key) > timeStamp)
                 {
@@ -33,21 +33,36 @@ namespace HmServiceCache.Storage.DataStructures
                 lastTimeStamps[key] = timeStamp;
                 return result;
             }
+            finally 
+            {
+                lockObj.ReleaseWriterLock();
+            }
         }
 
-        protected void UpdateData(Action operation, long timeStamp, string key)
-        {
-            var result = UpdateData(() => { operation(); return true; }, timeStamp, key);
-        }
+        protected void UpdateData(Action operation, long timeStamp, string key) => UpdateData(() => { operation(); return true; }, timeStamp, key);
 
-        public void RemoveKey(string key, long timeStamp)
-        {
-            UpdateData(() => collection.Remove(key, out _), timeStamp, key);
-        }
+        public void RemoveKey(string key, long timeStamp) => UpdateData(() => collection.Remove(key, out _), timeStamp, key);
 
-        public T GetByKey(string key) 
+        public T GetByKey(string key) => GetSomeData(() => collection.GetValueOrDefault(key), key);
+
+        public TData GetSomeData<TData>(Func<TData> operation, string key) 
         {
-            return collection.GetValueOrDefault(key);
+            ReaderWriterLock lockObj;
+            lock (lockObjects)
+            {
+                lockObj = lockObjects.SafeKey(key);
+            }
+
+            lockObj.AcquireReaderLock(TimeSpan.FromSeconds(30));
+
+            try
+            {
+                return operation();
+            }
+            finally
+            {
+                lockObj.ReleaseReaderLock();
+            }
         }
 
         public void Empty() 
