@@ -18,7 +18,7 @@ namespace HmServiceCache.Master.Hubs
         public async override Task OnConnectedAsync()
         {
             await base.OnConnectedAsync();
-            await Clients.Caller.LoadCaches(nodeStorage.GetAllNodes().Select(a => a.Url).ToArray());
+            await Clients.Caller.LoadCaches(nodeStorage.GetAllNodes().Select(a => a.AccessUrl).ToArray());
         }
 
         public async override Task OnDisconnectedAsync(Exception exception)

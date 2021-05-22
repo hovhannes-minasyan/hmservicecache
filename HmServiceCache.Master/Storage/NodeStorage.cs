@@ -25,7 +25,7 @@ namespace HmServiceCache.Master.Storage
             {
                 nodes.TryAdd(model.Id, model);
                 var client = clientFactory.CreateClient();
-                client.BaseAddress = new Uri(nodes[model.Id].Url);
+                client.BaseAddress = new Uri(nodes[model.Id].InternalAccessUrl);
                 httpClients.TryAdd(model.Id, client);
             }
         }

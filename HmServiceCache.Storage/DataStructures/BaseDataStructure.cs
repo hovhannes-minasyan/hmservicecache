@@ -49,9 +49,9 @@ namespace HmServiceCache.Storage.DataStructures
             lastTimeStamps.TryRemove(key, out _);
         }, timeStamp, key);
 
-        public T GetByKey(string key) => GetSomeData(() => collection.GetValueOrDefault(key), key);
+        public T GetByKey(string key) => SafeRetreiveData(() => collection.GetValueOrDefault(key), key);
 
-        public TData GetSomeData<TData>(Func<TData> operation, string key)
+        public TData SafeRetreiveData<TData>(Func<TData> operation, string key)
         {
             ReaderWriterLock lockObj;
             lock (lockObjects)

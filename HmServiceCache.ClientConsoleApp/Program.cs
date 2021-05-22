@@ -20,7 +20,8 @@ namespace HmServiceCache.ClientConsoleApp
             Console.ReadLine();
 
             //TestMasterConnection().Wait();
-            RunAppAsync().Wait();
+            //RunTestAppAsync().Wait();
+            StartCliAsync().GetAwaiter().GetResult();
 
             Console.WriteLine("END OF PROCESS");
             Console.WriteLine("Press enter to close");
@@ -58,15 +59,13 @@ namespace HmServiceCache.ClientConsoleApp
             Console.WriteLine("Test client connected to master");
         }
 
-        private async static Task RunAppAsync()
+        private async static Task RunTestAppAsync()
         {
             Console.WriteLine("App Started");
             cache = StartCache();
             Console.WriteLine("Cache created");
-            //await Task.Delay(5000);
 
             await TestListAsync();
-
         }
 
         private static IHmServiceCache StartCache()
@@ -126,6 +125,38 @@ namespace HmServiceCache.ClientConsoleApp
             }
 
             Console.WriteLine();
+        }
+
+        private static async Task StartCliAsync()
+        {
+            cache = StartCache();
+            while (true)
+            {
+                Console.Write("HMCache> ");
+                var command = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(command))
+                    continue;
+
+                var splitted = command.Split(' ');
+                var str = splitted[0].ToLower();
+                if (str == "quit")
+                    break;
+
+                var operation = splitted[1].ToLower();
+
+                if (str == "list")
+                {
+                    if (operation == "add")
+                    {
+                        await cache.AddToListAsync(splitted[2], splitted[3]);
+                    }
+                    else if (operation == "get")
+                    {
+                        var result = await cache.GetListValueAsync<string>(splitted[2], int.Parse(splitted[3]));
+                        Console.WriteLine(result);
+                    }
+                }
+            }
         }
     }
 }

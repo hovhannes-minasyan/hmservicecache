@@ -22,7 +22,6 @@ namespace HmServiceCache.Client.Services
 
         public async Task<HubConnection> NextAsync()
         {
-
             while (true)
             {
                 await asyncReaderWriterLock.AcquireReaderLock();
@@ -34,7 +33,7 @@ namespace HmServiceCache.Client.Services
                         await Task.Delay(1000);
                         continue;
                     }
-                    Console.WriteLine("Taking connection at {0}", currentIndex);
+                    //Console.WriteLine("Taking connection at {0}", currentIndex);
                     var result = connections[currentIndex++];
                     currentIndex %= connections.Count;
                     return result;
@@ -59,7 +58,7 @@ namespace HmServiceCache.Client.Services
             {
                 var connection = await GetConnectionAsync(urls[i % urls.Length]);
 
-                if (connection.State == HubConnectionState.Connected)
+                if (connection?.State == HubConnectionState.Connected)
                 {
                     var id = await connection.InvokeAsync<Guid>("GetId");
                     connections.Add(id, connection);
@@ -73,40 +72,55 @@ namespace HmServiceCache.Client.Services
         public async Task AddConnectionAsync(string url)
         {
             await asyncReaderWriterLock.AcquireWriterLock();
-            Console.WriteLine("Entered add connection lock");
-
-            var isSmall = connections.Count < configuration.PoolSize;
-            if (isSmall)
+            try
             {
-                var connection = await GetConnectionAsync(url);
-                var id = await connection.InvokeAsync<Guid>("GetId");
-                connections.Add(id, connection);
-            }
+                var isSmall = connections.Count < configuration.PoolSize;
+                if (isSmall)
+                {
+                    var connection = await GetConnectionAsync(url);
+                    if (connection == null)
+                        return;
 
-            asyncReaderWriterLock.ReleaseWriterLock();
-            Console.WriteLine("Released add connection lock");
+                    var id = await connection.InvokeAsync<Guid>("GetId");
+                    connections.Add(id, connection);
+                }
+            }
+            finally
+            {
+                asyncReaderWriterLock.ReleaseWriterLock();
+            }
         }
 
         public async Task RemoveConnection(Guid id)
         {
             await asyncReaderWriterLock.AcquireWriterLock();
-
-            var currentConnections = connections.GetByKey(id);
-            connections.Remove(id);
-
-            foreach (var conn in currentConnections)
+            try
             {
-                await conn.StopAsync();
-            }
+                var currentConnections = connections.GetByKey(id);
+                connections.Remove(id);
 
-            asyncReaderWriterLock.ReleaseWriterLock();
+                foreach (var conn in currentConnections)
+                {
+                    await conn.StopAsync();
+                }
+            }
+            finally
+            {
+                asyncReaderWriterLock.ReleaseWriterLock();
+            }
         }
 
         public async Task RemoveConnectionAfterClosing(HubConnection connection)
         {
             await asyncReaderWriterLock.AcquireWriterLock();
-            connections.Remove(connection);
-            asyncReaderWriterLock.ReleaseWriterLock();
+            try
+            {
+                connections.Remove(connection);
+            }
+            finally
+            {
+                asyncReaderWriterLock.ReleaseWriterLock();
+            }
         }
 
         private async Task<HubConnection> GetConnectionAsync(string url)
@@ -116,17 +130,15 @@ namespace HmServiceCache.Client.Services
                     .AddMessagePackProtocol()
                     .Build();
 
-            Console.WriteLine("Trying to connect url {0}", url);
-
             try
             {
                 await connection.StartAsync();
-                Console.WriteLine("Connection url at {0}", url);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 Console.WriteLine("Connection url at {0}", url);
+                return null;
             }
             return connection;
         }

@@ -9,6 +9,6 @@ namespace HmServiceCache.Storage.DataStructures
 
         public void RemoveHashValue(string key, string hash, long timestamp) => UpdateData(() => collection.SafeKey(key).Remove(hash, out _), timestamp, key);
 
-        public object GetHashValue(string key, string hash) => GetSomeData(() => collection.SafeKey(key)[hash], key);
+        public object GetHashValue(string key, string hash) => SafeRetreiveData(() => collection.SafeKey(key)[hash], key);
     }
 }

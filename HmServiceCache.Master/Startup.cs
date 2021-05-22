@@ -29,22 +29,18 @@ namespace HmServiceCache.Master
             {
                 option.OutputFormatters.Clear();
                 option.OutputFormatters.Add(new MessagePackOutputFormatter(options: MessagePackSerializerOptions.Standard));
-                //option.OutputFormatters.Add(new MessagePackOutputFormatter(ContractlessStandardResolver.Instance));
                 option.InputFormatters.Clear();
-                //option.InputFormatters.Add(new MessagePackInputFormatter(ContractlessStandardResolver.Instance));
                 option.InputFormatters.Add(new MessagePackInputFormatter(MessagePackSerializerOptions.Standard));
             });
 
-
             services.AddSignalR().AddMessagePackProtocol(options =>
             {
-                options.SerializerOptions = MessagePackSerializerOptions.Standard
-                    //.WithResolver(new CustomResolver())
-                    .WithSecurity(MessagePackSecurity.UntrustedData);
-            }); //.AddMessagePackProtocol().AddNewtonsoftJsonProtocol();
+                options.SerializerOptions = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
+            });
+
             services.AddHttpClient();
-            services.AddSingleton<INodeStorage, NodeStorage>();
             services.AddDataStorages();
+            services.AddSingleton<INodeStorage, NodeStorage>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

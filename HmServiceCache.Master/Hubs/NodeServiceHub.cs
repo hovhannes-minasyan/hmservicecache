@@ -31,13 +31,11 @@ namespace HmServiceCache.Master.Hubs
 
             await MasterLocks.ConnectionLock.AcquireWriterLock();
 
-            var id = Guid.Parse(Context.GetHttpContext().Request.Headers["Id"].First());
-            var accessUrl = Context.GetHttpContext().Request.Headers["AccessUri"].First();
-
             var storageModel = new NodeModel()
             {
-                Id = id,
-                Url = Context.GetHttpContext().Request.Headers["AccessUriInternal"].First(),
+                Id = Guid.Parse(Context.GetHttpContext().Request.Headers["Id"].First()),
+                InternalAccessUrl = Context.GetHttpContext().Request.Headers["AccessUriInternal"].First(),
+                AccessUrl = Context.GetHttpContext().Request.Headers["AccessUri"].First(),
             };
 
             await Clients.Caller.GetInitialState(dataStorage.GetAll());
@@ -45,7 +43,7 @@ namespace HmServiceCache.Master.Hubs
             nodeStorage.Add(storageModel);
             MasterLocks.ConnectionLock.ReleaseWriterLock();
 
-            await clientHubContext.Clients.All.CacheConnected(accessUrl);
+            await clientHubContext.Clients.All.CacheConnected(storageModel.AccessUrl);
         }
 
         public async override Task OnDisconnectedAsync(Exception exception)
