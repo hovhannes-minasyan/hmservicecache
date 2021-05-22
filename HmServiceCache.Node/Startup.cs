@@ -4,6 +4,8 @@ using HmServiceCache.Node.Hubs;
 using HmServiceCache.Node.Models;
 using HmServiceCache.Storage.Interfaces;
 using HmServiceCache.Storage.Storages;
+using MessagePack;
+using MessagePack.AspNetCoreMvcFormatter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -25,8 +27,23 @@ namespace HmServiceCache.Node
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddNewtonsoftJson();
-            services.AddSignalR().AddNewtonsoftJsonProtocol();
+            services.AddControllers();  //.AddNewtonsoftJson();
+            services.AddMvc().AddMvcOptions(option =>
+            {
+                option.OutputFormatters.Clear();
+                option.OutputFormatters.Add(new MessagePackOutputFormatter(options: MessagePackSerializerOptions.Standard));
+                //option.OutputFormatters.Add(new MessagePackOutputFormatter(ContractlessStandardResolver.Instance));
+                option.InputFormatters.Clear();
+                //option.InputFormatters.Add(new MessagePackInputFormatter(ContractlessStandardResolver.Instance));
+                option.InputFormatters.Add(new MessagePackInputFormatter(MessagePackSerializerOptions.Standard));
+            });
+
+            services.AddSignalR().AddMessagePackProtocol(options =>
+            {
+                options.SerializerOptions = MessagePackSerializerOptions.Standard
+                    //.WithResolver(new CustomResolver())
+                    .WithSecurity(MessagePackSecurity.UntrustedData);
+            }); //.AddMessagePackProtocol().AddNewtonsoftJsonProtocol();
             services.AddSwaggerGen();
             services.AddSingleton<ConfigurationModel>();
             services.AddSingleton<IDataStorage, DataStorage>();

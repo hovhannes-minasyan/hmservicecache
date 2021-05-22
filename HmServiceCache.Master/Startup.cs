@@ -2,6 +2,8 @@ using HmServiceCache.Master.Hubs;
 using HmServiceCache.Master.Storage;
 using HmServiceCache.Storage.Interfaces;
 using HmServiceCache.Storage.Storages;
+using MessagePack;
+using MessagePack.AspNetCoreMvcFormatter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,8 +25,24 @@ namespace HmServiceCache.Master
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSwaggerGen();
-            services.AddControllers().AddNewtonsoftJson();
-            services.AddSignalR().AddNewtonsoftJsonProtocol();
+            services.AddControllers();  //.AddNewtonsoftJson();
+            services.AddMvc().AddMvcOptions(option =>
+            {
+                option.OutputFormatters.Clear();
+                option.OutputFormatters.Add(new MessagePackOutputFormatter(options: MessagePackSerializerOptions.Standard));
+                //option.OutputFormatters.Add(new MessagePackOutputFormatter(ContractlessStandardResolver.Instance));
+                option.InputFormatters.Clear();
+                //option.InputFormatters.Add(new MessagePackInputFormatter(ContractlessStandardResolver.Instance));
+                option.InputFormatters.Add(new MessagePackInputFormatter(MessagePackSerializerOptions.Standard));
+            });
+
+
+            services.AddSignalR().AddMessagePackProtocol(options=> 
+            {
+                options.SerializerOptions = MessagePackSerializerOptions.Standard
+                    //.WithResolver(new CustomResolver())
+                    .WithSecurity(MessagePackSecurity.UntrustedData);
+            }); //.AddMessagePackProtocol().AddNewtonsoftJsonProtocol();
             services.AddHttpClient();
             services.AddSingleton<INodeStorage, NodeStorage>();
             services.AddSingleton<IDataStorage, DataStorage>();

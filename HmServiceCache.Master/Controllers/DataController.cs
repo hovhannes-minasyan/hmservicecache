@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Alphacloud.MessagePack.HttpFormatter;
+using MessagePack;
+using System.Threading;
 
 namespace HmServiceCache.Master.Controllers
 {
@@ -115,12 +118,10 @@ namespace HmServiceCache.Master.Controllers
                 url += $"&{pair.Key}={pair.Value}";
             }
 
-            var content = value == null ? null : new StringContent(JsonConvert.SerializeObject(value), Encoding.Unicode, "application/json");
-
             Func<HttpClient, Task<HttpResponseMessage>> createHttpRequestAsync = HttpContext.Request.Method switch
             {
-                "POST" => (client) => client.PostAsync(url, content),
-                "PUT" => (client) => client.PutAsync(url, content),
+                "POST" => (client) => client.PostAsMsgPackAsync(url, value, CancellationToken.None),
+                "PUT" => (client) => client.PutAsMsgPackAsync(url, value, CancellationToken.None),
                 "DELETE" => (client) => client.DeleteAsync(url),
                 "GET" => (client) => client.GetAsync(url),
                 _ => throw new InvalidOperationException(),

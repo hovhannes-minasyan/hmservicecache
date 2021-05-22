@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
+using HmServiceCache.Common.Extensions;
 
 namespace HmServiceCache.Storage.DataStructures
 {
     public class BaseDataStructure<T>
     {
+        //private ReaderWriterLock readerWriterLock = new ReaderWriterLock();
+
         private readonly ConcurrentDictionary<string, long> lastTimeStamps = new ConcurrentDictionary<string, long>();
         private readonly ConcurrentDictionary<string, object> lockObjects = new ConcurrentDictionary<string, object>();
         protected readonly ConcurrentDictionary<string, T> collection = new ConcurrentDictionary<string, T>();
@@ -15,11 +19,7 @@ namespace HmServiceCache.Storage.DataStructures
             object lockObj;
             lock (lockObjects)
             {
-                if (!lockObjects.ContainsKey(key))
-                {
-                    lockObjects[key] = new object();
-                }
-                lockObj = lockObjects[key];
+                lockObj = lockObjects.SafeKey(key);
             }
 
             lock (lockObj)

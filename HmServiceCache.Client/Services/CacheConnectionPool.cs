@@ -4,6 +4,7 @@ using HmServiceCache.Common.CustomDataStructures;
 using HmServiceCache.Common.Extensions;
 using HmServiceCache.Common.NodeModel;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +36,10 @@ namespace HmServiceCache.Client.Services
         {
             for (var i = 0; i < configuration.PoolSize; i++) 
             {
-                var connection = new HubConnectionBuilder().WithUrl(nodeModels[i % nodeModels.Length].Url + "/cache").Build();
+                var connection = new HubConnectionBuilder()
+                    .WithUrl(nodeModels[i % nodeModels.Length].Url + "/cache")
+                    .AddMessagePackProtocol()
+                    .Build();
                 
                 Console.WriteLine("Trying to connect index {0}", i);
                 try 

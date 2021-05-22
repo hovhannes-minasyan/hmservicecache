@@ -45,7 +45,7 @@ namespace HmServiceCache.Master.Hubs
 
         public async override Task OnDisconnectedAsync(Exception exception)
         {
-            var id = Guid.Parse(Context.GetHttpContext().Request.Query["Id"]);
+            var id = Guid.Parse(Context.GetHttpContext().Request.Headers["Id"]);
             await clientHubContext.Clients.All.CacheDisconnected(id);
             await base.OnDisconnectedAsync(exception);
             nodeStorage.Remove(id);

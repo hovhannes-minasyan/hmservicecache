@@ -7,13 +7,13 @@ namespace HmServiceCache.Client.Abstractions
 {
     public interface IStorageDataWriter
     {
-        Task SetValueAsync(string key, object value);
+        Task SetValueAsync<T>(string key, T value);
         Task RemoveValueAsync(string key);
 
-        Task AddToListAsync(string key, object value);
+        Task AddToListAsync<T>(string key, T value);
         Task RemoveListAsync(string key);
 
-        Task AddToHashMapAsync(string key, string hashKey, object obj);
+        Task AddToHashMapAsync<T>(string key, string hashKey, T obj);
         Task RemoveHashValueAsync(string key, string hash);
         Task RemoveHashMapAsync(string key);
 

@@ -6,6 +6,7 @@ using HmServiceCache.Storage.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -39,6 +40,7 @@ namespace HmServiceCache.Node.HubClients
                      opt.Headers.Add("AccessUriInternal", internalUri);
                  })
                 .WithAutomaticReconnect(retryPolicy)
+                .AddMessagePackProtocol()
                 .Build();
 
             connection.Closed += (e) => { storage.Empty(); return Task.CompletedTask; };

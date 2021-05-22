@@ -3,12 +3,17 @@ using HmServiceCache.Client.Models;
 using HmServiceCache.Client.RetryPolicies;
 using HmServiceCache.Common.NodeModel;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+
+using Alphacloud.MessagePack.HttpFormatter;
+using MessagePack;
 
 namespace HmServiceCache.Client.Services
 {
@@ -24,6 +29,7 @@ namespace HmServiceCache.Client.Services
 
             masterConnection = new HubConnectionBuilder()
                 .WithUrl(configuration.MasterCacheUrl + "/clienthub")
+                .AddMessagePackProtocol()
                 .WithAutomaticReconnect(retryPolicy)
                 .Build();
 
@@ -47,13 +53,13 @@ namespace HmServiceCache.Client.Services
             this.cacheConnectionPool = cacheConnectionPool;
         }
 
-        public Task AddToHashMapAsync(string key, string hashKey, object value)
+        public Task AddToHashMapAsync<T>(string key, string hashKey, T value)
         {
             var path = GetPath(key, "hashmap", hashKey);
             return MakeRequestAsync(HttpMethod.Put, path, value);
         }
 
-        public Task AddToListAsync(string key, object value)
+        public Task AddToListAsync<T>(string key, T value)
         {
             var path = GetPath(key, "list");
             return MakeRequestAsync(HttpMethod.Put, path, value);
@@ -108,7 +114,7 @@ namespace HmServiceCache.Client.Services
             return MakeRequestAsync(HttpMethod.Delete, path);
         }
 
-        public Task SetValueAsync(string key, object value)
+        public Task SetValueAsync<T>(string key, T value)
         {
             var path = GetPath(key, "value");
             return MakeRequestAsync(HttpMethod.Put, path, value);
@@ -124,17 +130,31 @@ namespace HmServiceCache.Client.Services
             return init;
         }
 
-        private async Task<HttpResponseMessage> MakeRequestAsync(HttpMethod method, string url, object value = null)
+        private async Task<HttpResponseMessage> MakeRequestAsync(HttpMethod method, string url)
         {
             var client = httpClientFactory.CreateClient("HmCacheMaster");
-            var json = JsonConvert.SerializeObject(value);
-            var content = value == null ? null : new StringContent(json, Encoding.UTF8, "application/json");
+            //var json = JsonConvert.SerializeObject(value);
+
             var responseTask = method.Method switch
             {
-                "POST" => client.PostAsync(url, content),
-                "PUT" => client.PutAsync(url, content),
                 "DELETE" => client.DeleteAsync(url),
                 "GET" => client.GetAsync(url),
+                _ => throw new InvalidOperationException(),
+            };
+            var response = await responseTask;
+            response.EnsureSuccessStatusCode();
+            return response;
+        }
+
+        private async Task<HttpResponseMessage> MakeRequestAsync<T>(HttpMethod method, string url, T value)
+        {
+            var client = httpClientFactory.CreateClient("HmCacheMaster");
+            //var json = JsonConvert.SerializeObject(value);
+
+            var responseTask = method.Method switch
+            {
+                "POST" => client.PostAsMsgPackAsync(url, value, CancellationToken.None),
+                "PUT" => client.PutAsMsgPackAsync(url, value, CancellationToken.None),
                 _ => throw new InvalidOperationException(),
             };
             var response = await responseTask;

@@ -2,6 +2,7 @@
 using HmServiceCache.Client.Extensions;
 using HmServiceCache.Client.Models;
 using HmServiceCache.Client.RetryPolicies;
+using MessagePack;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +20,8 @@ namespace HmServiceCache.ClientConsoleApp
             Console.WriteLine("Press enter to start");
             Console.ReadLine();
 
-            TestMasterConnection().Wait();
-            //RunAppAsync().Wait();
+            //TestMasterConnection().Wait();
+            RunAppAsync().Wait();
 
             Console.WriteLine("END OF PROCESS");
             Console.WriteLine("Press enter to close");
@@ -29,7 +30,7 @@ namespace HmServiceCache.ClientConsoleApp
 
         static async Task TestMasterConnection() 
         {
-
+            Console.WriteLine("Testing master connection");
             var retryPolicy = new ForeverRetryPolicy(TimeSpan.FromMilliseconds(100));
             var connection = new HubConnectionBuilder()
                 .WithUrl("http://localhost:15000" + $"/nodehub", opt =>
@@ -38,8 +39,24 @@ namespace HmServiceCache.ClientConsoleApp
                     opt.Headers.Add("Id", Guid.NewGuid().ToString());
                 })
                 .WithAutomaticReconnect(retryPolicy)
+                .AddMessagePackProtocol()
                 .Build();
+
             await connection.StartAsync();
+
+            Console.WriteLine("Test node connected to master");
+
+            Console.WriteLine("Testing master connection");
+
+            var connection1 = new HubConnectionBuilder()
+             .WithUrl("http://localhost:15000" + "/clienthub")
+             .AddMessagePackProtocol()
+             .WithAutomaticReconnect(retryPolicy)
+             .Build();
+
+            await connection1.StartAsync();
+
+            Console.WriteLine("Test client connected to master");
         }
 
         private async static Task RunAppAsync()
@@ -99,16 +116,6 @@ namespace HmServiceCache.ClientConsoleApp
                 Console.Write(item + " ");
             }
             Console.WriteLine();
-        }
-        class TempModel
-        {
-            public int A { get; set; }
-            public string B { get; set; }
-
-            public override string ToString()
-            {
-                return "{" + $"A = {A} B = {B}" + "}";
-            }
         }
     }
 }

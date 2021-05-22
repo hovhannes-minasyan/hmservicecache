@@ -6,7 +6,7 @@ namespace HmServiceCache.Common.Extensions
 {
     public static class DictionaryExtensions
     {
-        public static V SafeKey<T,V>(this IDictionary<T, V> dictionary, T key) where V : class, IEnumerable, new()
+        public static V SafeKey<T,V>(this IDictionary<T, V> dictionary, T key) where V : class, new()
         {
             if (!dictionary.ContainsKey(key))
             {
