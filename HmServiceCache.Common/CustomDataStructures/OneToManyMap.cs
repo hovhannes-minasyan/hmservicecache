@@ -1,14 +1,14 @@
-﻿using HmServiceCache.Common.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HmServiceCache.Common.Extensions;
 
 namespace HmServiceCache.Common.CustomDataStructures
 {
     public class OneToManyMap<TKey, TObj>
     {
-        readonly Dictionary<TKey, List<TObj>> keyToObjectMap = new Dictionary<TKey, List<TObj>>();
-        readonly Dictionary<TObj, TKey> objectToKeyMap = new Dictionary<TObj, TKey>();
+        private readonly Dictionary<TKey, List<TObj>> keyToObjectMap = new Dictionary<TKey, List<TObj>>();
+        private readonly Dictionary<TObj, TKey> objectToKeyMap = new Dictionary<TObj, TKey>();
 
         public void Add(TKey key, TObj obj)
         {
@@ -34,7 +34,7 @@ namespace HmServiceCache.Common.CustomDataStructures
             return objectToKeyMap.Keys.ToList();
         }
 
-        public void Clear() 
+        public void Clear()
         {
             keyToObjectMap.Clear();
             objectToKeyMap.Clear();

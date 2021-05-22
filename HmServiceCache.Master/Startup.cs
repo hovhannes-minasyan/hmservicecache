@@ -37,7 +37,7 @@ namespace HmServiceCache.Master
             });
 
 
-            services.AddSignalR().AddMessagePackProtocol(options=> 
+            services.AddSignalR().AddMessagePackProtocol(options =>
             {
                 options.SerializerOptions = MessagePackSerializerOptions.Standard
                     //.WithResolver(new CustomResolver())

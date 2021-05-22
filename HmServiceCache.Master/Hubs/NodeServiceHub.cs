@@ -1,10 +1,9 @@
-﻿using HmServiceCache.Common.NodeModel;
-using HmServiceCache.Master.Models;
-using HmServiceCache.Master.Storage;
-using Microsoft.AspNetCore.SignalR;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using HmServiceCache.Common.NodeModel;
+using HmServiceCache.Master.Storage;
+using Microsoft.AspNetCore.SignalR;
 
 namespace HmServiceCache.Master.Hubs
 {
@@ -21,7 +20,7 @@ namespace HmServiceCache.Master.Hubs
 
         public async override Task OnConnectedAsync()
         {
-            foreach(var i in Context.GetHttpContext().Request.Headers["Id"]) 
+            foreach (var i in Context.GetHttpContext().Request.Headers["Id"])
             {
                 Console.WriteLine($"ID = {i}");
             }
@@ -37,7 +36,7 @@ namespace HmServiceCache.Master.Hubs
                 Id = id,
                 Url = Context.GetHttpContext().Request.Headers["AccessUriInternal"].First(),
             };
-            
+
             await base.OnConnectedAsync();
             nodeStorage.Add(storageModel);
             await clientHubContext.Clients.All.CacheConnected(clientModel);

@@ -1,9 +1,7 @@
-﻿using HmServiceCache.Storage.DataStructures;
-using HmServiceCache.Storage.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using HmServiceCache.Storage.DataStructures;
+using HmServiceCache.Storage.Interfaces;
 
 namespace HmServiceCache.Storage.Storages
 {
@@ -42,7 +40,7 @@ namespace HmServiceCache.Storage.Storages
 
         public Dictionary<string, object> GetHasMap(string key)
         {
-            return hashMapStorage.GetByKey(key).ToDictionary(i=>i.Key, i=>i.Value);
+            return hashMapStorage.GetByKey(key).ToDictionary(i => i.Key, i => i.Value);
         }
 
         public List<object> GetList(string key)

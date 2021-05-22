@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HmServiceCache.Storage.Interfaces
+﻿namespace HmServiceCache.Storage.Interfaces
 {
     public interface IDataStorageWriter
     {

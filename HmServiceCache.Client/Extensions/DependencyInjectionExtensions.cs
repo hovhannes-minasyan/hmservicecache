@@ -1,8 +1,8 @@
-﻿using HmServiceCache.Client.Abstractions;
+﻿using System;
+using HmServiceCache.Client.Abstractions;
 using HmServiceCache.Client.Models;
 using HmServiceCache.Client.Services;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace HmServiceCache.Client.Extensions
 {

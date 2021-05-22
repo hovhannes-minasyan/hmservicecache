@@ -1,8 +1,7 @@
-﻿using HmServiceCache.Common.NodeModel;
-using HmServiceCache.Master.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using HmServiceCache.Common.NodeModel;
 
 namespace HmServiceCache.Master.Storage
 {

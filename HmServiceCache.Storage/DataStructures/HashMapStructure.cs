@@ -1,5 +1,5 @@
-﻿using HmServiceCache.Common.Extensions;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
+using HmServiceCache.Common.Extensions;
 
 namespace HmServiceCache.Storage.DataStructures
 {

@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
-using System;
+﻿using System;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace HmServiceCache.Client.RetryPolicies
 {

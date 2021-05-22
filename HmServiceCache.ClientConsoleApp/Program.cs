@@ -1,21 +1,20 @@
-﻿using HmServiceCache.Client.Abstractions;
+﻿using System;
+using System.Threading.Tasks;
+using HmServiceCache.Client.Abstractions;
 using HmServiceCache.Client.Extensions;
 using HmServiceCache.Client.Models;
 using HmServiceCache.Client.RetryPolicies;
-using MessagePack;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using System;
-using System.Threading.Tasks;
 
 namespace HmServiceCache.ClientConsoleApp
 {
-    class Program
+    internal class Program
     {
-        static IHmServiceCache cache;
-        static void Main(string[] args)
+        private static IHmServiceCache cache;
+
+        private static void Main(string[] args)
         {
             Console.WriteLine("Press enter to start");
             Console.ReadLine();
@@ -28,7 +27,7 @@ namespace HmServiceCache.ClientConsoleApp
             Console.ReadLine();
         }
 
-        static async Task TestMasterConnection() 
+        private static async Task TestMasterConnection()
         {
             Console.WriteLine("Testing master connection");
             var retryPolicy = new ForeverRetryPolicy(TimeSpan.FromMilliseconds(100));
@@ -67,14 +66,14 @@ namespace HmServiceCache.ClientConsoleApp
             await Task.Delay(5000);
 
             await TestListAsync();
-            
+
         }
 
         private static IHmServiceCache StartCache()
         {
             var configuration = new ConfigurationBuilder().AddJsonFile($"appsettings.json", true, true).Build();
             var configModel = new ConfigurationModel(configuration["MasterUri"]);
-            
+
             var services = new ServiceCollection().AddHmServiceCache(configModel);
 
             var provider = services.BuildServiceProvider();
@@ -82,7 +81,7 @@ namespace HmServiceCache.ClientConsoleApp
             return cache;
         }
 
-        private static async Task TestListAsync() 
+        private static async Task TestListAsync()
         {
             var listKey = "myList";
             await cache.AddToListAsync(listKey, 5);

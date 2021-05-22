@@ -1,10 +1,10 @@
-﻿using HmServiceCache.Node.Abstractions;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using HmServiceCache.Node.Abstractions;
 using HmServiceCache.Node.Models;
 using HmServiceCache.Storage.Interfaces;
 using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace HmServiceCache.Node.Hubs
 {
@@ -19,7 +19,7 @@ namespace HmServiceCache.Node.Hubs
             this.configurationModel = configurationModel;
         }
 
-        public Guid GetId() 
+        public Guid GetId()
         {
             return configurationModel.Id;
         }

@@ -1,4 +1,6 @@
-﻿using HmServiceCache.Client.RetryPolicies;
+﻿using System;
+using System.Threading.Tasks;
+using HmServiceCache.Client.RetryPolicies;
 using HmServiceCache.Node.Abstractions;
 using HmServiceCache.Node.Hubs;
 using HmServiceCache.Node.Models;
@@ -7,9 +9,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Globalization;
-using System.Threading.Tasks;
 
 namespace HmServiceCache.Node.HubClients
 {
@@ -26,19 +25,19 @@ namespace HmServiceCache.Node.HubClients
             this.storage = storage;
             this.clientHub = clientHub;
             var masterUri = Environment.GetEnvironmentVariable("MasterUri") ?? configuration["MasterUri"];
-            var accessUri = Environment.GetEnvironmentVariable("AccessUri")?? configuration["AccessUri"];
+            var accessUri = Environment.GetEnvironmentVariable("AccessUri") ?? configuration["AccessUri"];
             var internalUri = Environment.GetEnvironmentVariable("AccessUriInternal") ?? accessUri;
 
             Console.WriteLine("Connection to master {0}", masterUri);
 
             var retryPolicy = new ForeverRetryPolicy(TimeSpan.FromMilliseconds(int.Parse(configuration["RetryIntervalMiliseconds"])));
             connection = new HubConnectionBuilder()
-                .WithUrl( masterUri + $"/nodehub", opt =>
-                 {
-                     opt.Headers.Add("AccessUri", accessUri);
-                     opt.Headers.Add("Id", config.Id.ToString());
-                     opt.Headers.Add("AccessUriInternal", internalUri);
-                 })
+                .WithUrl(masterUri + $"/nodehub", opt =>
+                {
+                    opt.Headers.Add("AccessUri", accessUri);
+                    opt.Headers.Add("Id", config.Id.ToString());
+                    opt.Headers.Add("AccessUriInternal", internalUri);
+                })
                 .WithAutomaticReconnect(retryPolicy)
                 .AddMessagePackProtocol()
                 .Build();

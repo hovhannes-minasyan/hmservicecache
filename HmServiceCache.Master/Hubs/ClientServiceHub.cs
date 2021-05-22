@@ -1,7 +1,7 @@
-﻿using HmServiceCache.Master.Storage;
-using Microsoft.AspNetCore.SignalR;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using HmServiceCache.Master.Storage;
+using Microsoft.AspNetCore.SignalR;
 
 namespace HmServiceCache.Master.Hubs
 {

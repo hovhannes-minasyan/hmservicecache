@@ -1,14 +1,11 @@
-﻿using HmServiceCache.Client.Abstractions;
+﻿using System;
+using System.Threading.Tasks;
+using HmServiceCache.Client.Abstractions;
 using HmServiceCache.Client.Models;
 using HmServiceCache.Common.CustomDataStructures;
-using HmServiceCache.Common.Extensions;
 using HmServiceCache.Common.NodeModel;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HmServiceCache.Client.Services
 {
@@ -23,9 +20,9 @@ namespace HmServiceCache.Client.Services
             this.configuration = configuration;
         }
 
-        public HubConnection Next() 
+        public HubConnection Next()
         {
-            lock (connections) 
+            lock (connections)
             {
                 Console.WriteLine("Taking connection at {0}", currentIndex);
                 var result = connections[currentIndex++];
@@ -36,21 +33,21 @@ namespace HmServiceCache.Client.Services
 
         public async Task PopulatePoolAsync(NodeModel[] nodeModels)
         {
-            for (var i = 0; i < configuration.PoolSize; i++) 
+            for (var i = 0; i < configuration.PoolSize; i++)
             {
                 var connection = new HubConnectionBuilder()
                     .WithUrl(nodeModels[i % nodeModels.Length].Url + "/cache")
                     .AddMessagePackProtocol()
                     .Build();
-                
+
                 Console.WriteLine("Trying to connect index {0}", i);
-                try 
+                try
                 {
                     await connection.StartAsync();
                     Console.WriteLine("Connection started at {0}", i);
                 }
-                catch (Exception ex) 
-                { 
+                catch (Exception ex)
+                {
                     Console.WriteLine(ex);
                     Console.WriteLine("Connection failed at {0}", i);
                 }

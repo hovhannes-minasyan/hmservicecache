@@ -33,7 +33,7 @@ namespace HmServiceCache.Storage.DataStructures
                 lastTimeStamps[key] = timeStamp;
                 return result;
             }
-            finally 
+            finally
             {
                 lockObj.ReleaseWriterLock();
             }
@@ -41,11 +41,16 @@ namespace HmServiceCache.Storage.DataStructures
 
         protected void UpdateData(Action operation, long timeStamp, string key) => UpdateData(() => { operation(); return true; }, timeStamp, key);
 
-        public void RemoveKey(string key, long timeStamp) => UpdateData(() => collection.Remove(key, out _), timeStamp, key);
+        public void RemoveKey(string key, long timeStamp) => UpdateData(() =>
+        {
+            collection.Remove(key, out _);
+            lockObjects.TryRemove(key, out _);
+            lastTimeStamps.TryRemove(key, out _);
+        }, timeStamp, key);
 
         public T GetByKey(string key) => GetSomeData(() => collection.GetValueOrDefault(key), key);
 
-        public TData GetSomeData<TData>(Func<TData> operation, string key) 
+        public TData GetSomeData<TData>(Func<TData> operation, string key)
         {
             ReaderWriterLock lockObj;
             lock (lockObjects)
@@ -65,7 +70,7 @@ namespace HmServiceCache.Storage.DataStructures
             }
         }
 
-        public void Empty() 
+        public void Empty()
         {
             collection.Clear();
             lockObjects.Clear();

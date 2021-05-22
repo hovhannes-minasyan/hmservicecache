@@ -1,3 +1,4 @@
+using System.Threading;
 using HmServiceCache.Node.Abstractions;
 using HmServiceCache.Node.HubClients;
 using HmServiceCache.Node.Hubs;
@@ -11,7 +12,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Threading;
 
 namespace HmServiceCache.Node
 {
