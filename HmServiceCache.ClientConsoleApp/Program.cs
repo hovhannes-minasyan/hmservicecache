@@ -63,7 +63,7 @@ namespace HmServiceCache.ClientConsoleApp
             Console.WriteLine("App Started");
             cache = StartCache();
             Console.WriteLine("Cache created");
-            await Task.Delay(5000);
+            //await Task.Delay(5000);
 
             await TestListAsync();
 

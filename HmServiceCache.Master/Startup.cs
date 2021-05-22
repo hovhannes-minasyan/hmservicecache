@@ -1,7 +1,6 @@
 using HmServiceCache.Master.Hubs;
 using HmServiceCache.Master.Storage;
-using HmServiceCache.Storage.Interfaces;
-using HmServiceCache.Storage.Storages;
+using HmServiceCache.Storage.Extensions;
 using MessagePack;
 using MessagePack.AspNetCoreMvcFormatter;
 using Microsoft.AspNetCore.Builder;
@@ -45,7 +44,7 @@ namespace HmServiceCache.Master
             }); //.AddMessagePackProtocol().AddNewtonsoftJsonProtocol();
             services.AddHttpClient();
             services.AddSingleton<INodeStorage, NodeStorage>();
-            services.AddSingleton<IDataStorage, DataStorage>();
+            services.AddDataStorages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

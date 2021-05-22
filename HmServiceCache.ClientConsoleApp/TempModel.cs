@@ -7,6 +7,7 @@ namespace HmServiceCache.ClientConsoleApp
     {
         [Key(0)]
         public int A { get; set; }
+
         [Key(1)]
         public string B { get; set; }
 

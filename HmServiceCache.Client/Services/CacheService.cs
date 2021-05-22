@@ -7,7 +7,6 @@ using Alphacloud.MessagePack.HttpFormatter;
 using HmServiceCache.Client.Abstractions;
 using HmServiceCache.Client.Models;
 using HmServiceCache.Client.RetryPolicies;
-using HmServiceCache.Common.NodeModel;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,19 +28,21 @@ namespace HmServiceCache.Client.Services
                 .WithAutomaticReconnect(retryPolicy)
                 .Build();
 
-            masterConnection.On<NodeModel[]>("LoadCaches", async (nodeModels) =>
+            masterConnection.On<string[]>("LoadCaches", async (nodeModels) =>
             {
                 await cacheConnectionPool.PopulatePoolAsync(nodeModels);
             });
 
-            masterConnection.On<NodeModel>("CacheDisconnected", (nodeModel) =>
+            masterConnection.On<Guid>("CacheDisconnected", async (id) =>
             {
-                Console.WriteLine("Cache disconnected {0}", nodeModel);
+                Console.WriteLine("Cache disconnected {0}", id);
+                await cacheConnectionPool.RemoveConnection(id);
             });
 
-            masterConnection.On<NodeModel>("CacheConnected", (nodeModel) =>
+            masterConnection.On<string>("CacheConnected", async (url) =>
             {
-                Console.WriteLine("Cache connected {0}", nodeModel);
+                Console.WriteLine("Cache connected {0}", url);
+                await cacheConnectionPool.AddConnectionAsync(url);
             });
 
             masterConnection.StartAsync().Wait();
@@ -61,29 +62,34 @@ namespace HmServiceCache.Client.Services
             return MakeRequestAsync(HttpMethod.Put, path, value);
         }
 
-        public Task<T> GetHashValueAsync<T>(string key, string hashKey)
+        public async Task<T> GetHashValueAsync<T>(string key, string hashKey)
         {
-            return Node.InvokeAsync<T>("GetHashValue", key, hashKey);
+            var node = await cacheConnectionPool.NextAsync();
+            return await node.InvokeAsync<T>("GetHashValue", key, hashKey);
         }
 
-        public Task<Dictionary<string, T>> GetHasMapAsync<T>(string key)
+        public async Task<Dictionary<string, T>> GetHasMapAsync<T>(string key)
         {
-            return Node.InvokeAsync<Dictionary<string, T>>("GetHasMap", key);
+            var node = await cacheConnectionPool.NextAsync();
+            return await node.InvokeAsync<Dictionary<string, T>>("GetHasMap", key);
         }
 
-        public Task<List<T>> GetListAsync<T>(string key)
+        public async Task<List<T>> GetListAsync<T>(string key)
         {
-            return Node.InvokeAsync<List<T>>("GetList", key);
+            var node = await cacheConnectionPool.NextAsync();
+            return await node.InvokeAsync<List<T>>("GetList", key);
         }
 
-        public Task<T> GetListValueAsync<T>(string key, int index)
+        public async Task<T> GetListValueAsync<T>(string key, int index)
         {
-            return Node.InvokeAsync<T>("GetListValue", key, index);
+            var node = await cacheConnectionPool.NextAsync();
+            return await node.InvokeAsync<T>("GetListValue", key, index);
         }
 
-        public Task<T> GetValueAsync<T>(string key)
+        public async Task<T> GetValueAsync<T>(string key)
         {
-            return Node.InvokeAsync<T>("GetValue", key);
+            var node = await cacheConnectionPool.NextAsync();
+            return await node.InvokeAsync<T>("GetValue", key);
         }
 
         public Task RemoveHashMapAsync(string key)
@@ -145,7 +151,6 @@ namespace HmServiceCache.Client.Services
         private async Task<HttpResponseMessage> MakeRequestAsync<T>(HttpMethod method, string url, T value)
         {
             var client = httpClientFactory.CreateClient("HmCacheMaster");
-            //var json = JsonConvert.SerializeObject(value);
 
             var responseTask = method.Method switch
             {
@@ -157,7 +162,5 @@ namespace HmServiceCache.Client.Services
             response.EnsureSuccessStatusCode();
             return response;
         }
-
-        private HubConnection Node => cacheConnectionPool.Next();
     }
 }

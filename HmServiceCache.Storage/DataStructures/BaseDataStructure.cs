@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using HmServiceCache.Common.Extensions;
 
@@ -75,6 +76,19 @@ namespace HmServiceCache.Storage.DataStructures
             collection.Clear();
             lockObjects.Clear();
             lastTimeStamps.Clear();
+        }
+
+        public Dictionary<string, T> GetAll()
+        {
+            return collection.ToDictionary(a => a.Key, a => a.Value);
+        }
+
+        public void Set(Dictionary<string, T> data)
+        {
+            foreach (var pair in data)
+            {
+                collection.TryAdd(pair.Key, pair.Value);
+            }
         }
     }
 }

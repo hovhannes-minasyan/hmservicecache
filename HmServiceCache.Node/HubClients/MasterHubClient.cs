@@ -5,6 +5,7 @@ using HmServiceCache.Node.Abstractions;
 using HmServiceCache.Node.Hubs;
 using HmServiceCache.Node.Models;
 using HmServiceCache.Storage.Interfaces;
+using HmServiceCache.Storage.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
@@ -15,15 +16,9 @@ namespace HmServiceCache.Node.HubClients
     public class MasterHubClient : IMasterHubClient
     {
         private readonly HubConnection connection;
-        private readonly IConfiguration configuration;
-        private readonly IDataStorage storage;
-        private readonly IHubContext<CachingHub, ICachingClientProxy> clientHub;
 
-        public MasterHubClient(IConfiguration configuration, IDataStorage storage, IHubContext<CachingHub, ICachingClientProxy> clientHub, ConfigurationModel config)
+        public MasterHubClient(IConfiguration configuration, IDataStorageWriter storage, IHubContext<CachingHub, ICachingClientProxy> clientHub, ConfigurationModel config)
         {
-            this.configuration = configuration;
-            this.storage = storage;
-            this.clientHub = clientHub;
             var masterUri = Environment.GetEnvironmentVariable("MasterUri") ?? configuration["MasterUri"];
             var accessUri = Environment.GetEnvironmentVariable("AccessUri") ?? configuration["AccessUri"];
             var internalUri = Environment.GetEnvironmentVariable("AccessUriInternal") ?? accessUri;
@@ -43,6 +38,10 @@ namespace HmServiceCache.Node.HubClients
                 .Build();
 
             connection.Closed += (e) => { storage.Empty(); return Task.CompletedTask; };
+            connection.On("GetInitialState", (FullDataStorageModel data) =>
+            {
+                storage.SetAll(data);
+            });
         }
 
         public async Task StartAsync()

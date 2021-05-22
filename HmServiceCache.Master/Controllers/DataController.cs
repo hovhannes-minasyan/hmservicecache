@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Alphacloud.MessagePack.HttpFormatter;
+using HmServiceCache.Master.Constants;
 using HmServiceCache.Master.Storage;
 using HmServiceCache.Storage.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -23,20 +24,20 @@ namespace HmServiceCache.Master.Controllers
             this.dataStorage = dataStorage;
         }
 
-        [HttpGet("test")]
-        public ActionResult Test([FromQuery] long time)
-        {
-            var req = HttpContext.Request;
-            Console.WriteLine(req.Path.Value);
-            return Ok();
-        }
-
         [HttpPut("hashmap/{hash}")]
         public async Task<ActionResult> AddToHashMap([FromRoute] string key, [FromQuery] string hash, [FromBody] object value)
         {
-            var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            dataStorage.AddToHashMap(key, hash, value, timeStamp);
-            await ForwardRequest(timeStamp, value);
+            await MasterLocks.ConnectionLock.AcquireReaderLock();
+            try
+            {
+                var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                dataStorage.AddToHashMap(key, hash, value, timeStamp);
+                await ForwardRequest(timeStamp, value);
+            }
+            finally
+            {
+                MasterLocks.ConnectionLock.ReleaseReaderLock();
+            }
 
             return Ok();
         }
@@ -44,9 +45,18 @@ namespace HmServiceCache.Master.Controllers
         [HttpPut("value")]
         public async Task<ActionResult> AddValue([FromRoute] string key, [FromBody] object value)
         {
-            var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            dataStorage.AddValue(key, value, timeStamp);
-            await ForwardRequest(timeStamp, value);
+            await MasterLocks.ConnectionLock.AcquireReaderLock();
+            try
+            {
+                var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                dataStorage.AddValue(key, value, timeStamp);
+                await ForwardRequest(timeStamp, value);
+            }
+            finally
+            {
+                MasterLocks.ConnectionLock.ReleaseReaderLock();
+            }
+
 
             return Ok();
         }
@@ -54,18 +64,35 @@ namespace HmServiceCache.Master.Controllers
         [HttpPut("list")]
         public async Task<ActionResult> AddToList([FromRoute] string key, [FromBody] object value)
         {
-            var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            dataStorage.AddToList(key, value, timeStamp);
-            await ForwardRequest(timeStamp, value);
+            await MasterLocks.ConnectionLock.AcquireReaderLock();
+            try
+            {
+                var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                dataStorage.AddToList(key, value, timeStamp);
+                await ForwardRequest(timeStamp, value);
+            }
+            finally
+            {
+                MasterLocks.ConnectionLock.ReleaseReaderLock();
+            }
+
             return Ok();
         }
 
         [HttpDelete("hashmap/{hash}")]
         public async Task<ActionResult> RemoveFromHashMap([FromRoute] string key, [FromQuery] string hash)
         {
-            var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            dataStorage.RemoveFromHashMap(key, hash, timeStamp);
-            await ForwardRequest(timeStamp);
+            await MasterLocks.ConnectionLock.AcquireReaderLock();
+            try
+            {
+                var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                dataStorage.RemoveFromHashMap(key, hash, timeStamp);
+                await ForwardRequest(timeStamp);
+            }
+            finally
+            {
+                MasterLocks.ConnectionLock.ReleaseReaderLock();
+            }
 
             return Ok();
         }
@@ -73,9 +100,17 @@ namespace HmServiceCache.Master.Controllers
         [HttpDelete("hashmap")]
         public async Task<ActionResult> RemoveHashMap([FromRoute] string key)
         {
-            var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            dataStorage.RemoveHashMap(key, timeStamp);
-            await ForwardRequest(timeStamp);
+            await MasterLocks.ConnectionLock.AcquireReaderLock();
+            try
+            {
+                var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                dataStorage.RemoveHashMap(key, timeStamp);
+                await ForwardRequest(timeStamp);
+            }
+            finally
+            {
+                MasterLocks.ConnectionLock.ReleaseReaderLock();
+            }
 
             return Ok();
         }
@@ -84,9 +119,17 @@ namespace HmServiceCache.Master.Controllers
         [HttpDelete("value")]
         public async Task<ActionResult> RemoveValue([FromRoute] string key)
         {
-            var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            dataStorage.RemoveValue(key, timeStamp);
-            await ForwardRequest(timeStamp);
+            await MasterLocks.ConnectionLock.AcquireReaderLock();
+            try
+            {
+                var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                dataStorage.RemoveValue(key, timeStamp);
+                await ForwardRequest(timeStamp);
+            }
+            finally
+            {
+                MasterLocks.ConnectionLock.ReleaseReaderLock();
+            }
 
             return Ok();
         }
@@ -94,9 +137,17 @@ namespace HmServiceCache.Master.Controllers
         [HttpDelete("list")]
         public async Task<ActionResult> RemoveList([FromRoute] string key)
         {
-            var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            dataStorage.RemoveList(key, timeStamp);
-            await ForwardRequest(timeStamp);
+            await MasterLocks.ConnectionLock.AcquireReaderLock();
+            try
+            {
+                var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                dataStorage.RemoveList(key, timeStamp);
+                await ForwardRequest(timeStamp);
+            }
+            finally
+            {
+                MasterLocks.ConnectionLock.ReleaseReaderLock();
+            }
 
             return Ok();
         }

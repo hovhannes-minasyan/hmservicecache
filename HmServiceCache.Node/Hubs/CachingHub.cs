@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace HmServiceCache.Node.Hubs
 {
-    public class CachingHub : Hub<ICachingClientProxy>, IDataStorageReader
+    public class CachingHub : Hub<ICachingClientProxy>
     {
         private readonly IDataStorage dataStorage;
         private readonly ConfigurationModel configurationModel;

@@ -1,4 +1,6 @@
-﻿namespace HmServiceCache.Storage.Interfaces
+﻿using HmServiceCache.Storage.Models;
+
+namespace HmServiceCache.Storage.Interfaces
 {
     public interface IDataStorageWriter
     {
@@ -10,5 +12,7 @@
         void RemoveList(string key, long timestamp);
         void RemoveHashMap(string key, long timestamp);
         void RemoveFromHashMap(string key, string hash, long timestamp);
+        void SetAll(FullDataStorageModel fullDataStorageModel);
+        void Empty();
     }
 }

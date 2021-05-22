@@ -3,8 +3,7 @@ using HmServiceCache.Node.Abstractions;
 using HmServiceCache.Node.HubClients;
 using HmServiceCache.Node.Hubs;
 using HmServiceCache.Node.Models;
-using HmServiceCache.Storage.Interfaces;
-using HmServiceCache.Storage.Storages;
+using HmServiceCache.Storage.Extensions;
 using MessagePack;
 using MessagePack.AspNetCoreMvcFormatter;
 using Microsoft.AspNetCore.Builder;
@@ -46,7 +45,7 @@ namespace HmServiceCache.Node
             }); //.AddMessagePackProtocol().AddNewtonsoftJsonProtocol();
             services.AddSwaggerGen();
             services.AddSingleton<ConfigurationModel>();
-            services.AddSingleton<IDataStorage, DataStorage>();
+            services.AddDataStorages();
             services.AddSingleton<IMasterHubClient, MasterHubClient>();
         }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using HmServiceCache.Storage.Models;
 
 namespace HmServiceCache.Storage.Interfaces
 {
@@ -11,5 +12,6 @@ namespace HmServiceCache.Storage.Interfaces
 
         Dictionary<string, object> GetHasMap(string key);
         object GetHashValue(string key, string hashKey);
+        FullDataStorageModel GetAll();
     }
 }

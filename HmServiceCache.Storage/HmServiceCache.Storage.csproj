@@ -8,8 +8,4 @@
     <ProjectReference Include="..\HmServiceCache.Common\HmServiceCache.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-  </ItemGroup>
-
 </Project>

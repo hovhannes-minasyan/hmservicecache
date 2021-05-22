@@ -1,12 +1,14 @@
-﻿using System.Threading.Tasks;
-using HmServiceCache.Common.NodeModel;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace HmServiceCache.Client.Abstractions
 {
     public interface ICacheConnectionPool
     {
-        HubConnection Next();
-        Task PopulatePoolAsync(NodeModel[] nodeModels);
+        Task AddConnectionAsync(string url);
+        Task<HubConnection> NextAsync();
+        Task PopulatePoolAsync(string[] urls);
+        Task RemoveConnection(Guid id);
     }
 }

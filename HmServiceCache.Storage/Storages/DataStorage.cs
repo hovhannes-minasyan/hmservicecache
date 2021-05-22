@@ -2,6 +2,7 @@
 using System.Linq;
 using HmServiceCache.Storage.DataStructures;
 using HmServiceCache.Storage.Interfaces;
+using HmServiceCache.Storage.Models;
 
 namespace HmServiceCache.Storage.Storages
 {
@@ -76,6 +77,20 @@ namespace HmServiceCache.Storage.Storages
         public void RemoveValue(string key, long timestamp)
         {
             valueStorage.RemoveKey(key, timestamp);
+        }
+
+        public FullDataStorageModel GetAll() => new FullDataStorageModel
+        {
+            Values = valueStorage.GetAll(),
+            Lists = listStorage.GetAll(),
+            HashMaps = hashMapStorage.GetAll(),
+        };
+
+        public void SetAll(FullDataStorageModel fullDataStorageModel)
+        {
+            valueStorage.Set(fullDataStorageModel.Values);
+            listStorage.Set(fullDataStorageModel.Lists);
+            hashMapStorage.Set(fullDataStorageModel.HashMaps);
         }
     }
 }
