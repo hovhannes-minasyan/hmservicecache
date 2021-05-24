@@ -22,29 +22,26 @@ namespace HmServiceCache.Client.Services
 
         public async Task<HubConnection> NextAsync()
         {
-            while (true)
+            try 
             {
-                await asyncReaderWriterLock.AcquireReaderLock();
-                try
+                while (true) 
                 {
+                    await asyncReaderWriterLock.AcquireReaderLock();
                     if (connections.Count == 0)
                     {
                         asyncReaderWriterLock.ReleaseReaderLock();
                         await Task.Delay(1000);
                         continue;
                     }
-                    //Console.WriteLine("Taking connection at {0}", currentIndex);
                     var result = connections[currentIndex++];
                     currentIndex %= connections.Count;
                     return result;
                 }
-                finally
-                {
-                    asyncReaderWriterLock.ReleaseReaderLock();
-                }
-
             }
-
+            finally
+            {
+                asyncReaderWriterLock.ReleaseReaderLock();
+            }
         }
 
         public async Task PopulatePoolAsync(string[] urls)
@@ -53,25 +50,28 @@ namespace HmServiceCache.Client.Services
                 return;
 
             await asyncReaderWriterLock.AcquireWriterLock();
-
-            for (var i = 0; i < configuration.PoolSize; i++)
+            try
             {
-                var connection = await GetConnectionAsync(urls[i % urls.Length]);
-
-                if (connection?.State == HubConnectionState.Connected)
+                for (var i = 0; i < configuration.PoolSize; i++)
                 {
-                    var id = await connection.InvokeAsync<Guid>("GetId");
-                    connections.Add(id, connection);
+                    var connection = await GetConnectionAsync(urls[i % urls.Length]);
+                    if (connection?.State == HubConnectionState.Connected)
+                    {
+                        var id = await connection.InvokeAsync<Guid>("GetId");
+                        connections.Add(id, connection);
+                    }
                 }
             }
-
-            asyncReaderWriterLock.ReleaseWriterLock();
-
+            finally 
+            {
+                asyncReaderWriterLock.ReleaseWriterLock();
+            }
         }
 
         public async Task AddConnectionAsync(string url)
         {
             await asyncReaderWriterLock.AcquireWriterLock();
+
             try
             {
                 var isSmall = connections.Count < configuration.PoolSize;
@@ -134,10 +134,8 @@ namespace HmServiceCache.Client.Services
             {
                 await connection.StartAsync();
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine(ex);
-                Console.WriteLine("Connection url at {0}", url);
                 return null;
             }
             return connection;

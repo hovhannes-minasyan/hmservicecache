@@ -1,6 +1,6 @@
 ﻿using MessagePack;
 
-namespace HmServiceCache.ClientConsoleApp
+namespace HmServiceCache.ClientConsoleApp.Models
 {
     [MessagePackObject]
     public class TempModel

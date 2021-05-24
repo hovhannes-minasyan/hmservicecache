@@ -24,7 +24,7 @@ namespace HmServiceCache.Master
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSwaggerGen();
-            services.AddControllers();  //.AddNewtonsoftJson();
+            services.AddControllers();
             services.AddMvc().AddMvcOptions(option =>
             {
                 option.OutputFormatters.Clear();

@@ -14,6 +14,7 @@ namespace HmServiceCache.Client.Services
 {
     internal class CacheService : IHmServiceCache
     {
+        private bool isPopulated;
         private readonly HubConnection masterConnection;
         private readonly IHttpClientFactory httpClientFactory;
         private readonly ICacheConnectionPool cacheConnectionPool;
@@ -21,6 +22,8 @@ namespace HmServiceCache.Client.Services
         public CacheService(ConfigurationModel configuration, IHttpClientFactory httpClientFactory, ICacheConnectionPool cacheConnectionPool)
         {
             var retryPolicy = new ForeverRetryPolicy(configuration.RetryIntervalMiliseconds);
+            this.httpClientFactory = httpClientFactory;
+            this.cacheConnectionPool = cacheConnectionPool;
 
             masterConnection = new HubConnectionBuilder()
                 .WithUrl(configuration.MasterCacheUrl + "/clienthub")
@@ -31,23 +34,27 @@ namespace HmServiceCache.Client.Services
             masterConnection.On<string[]>("LoadCaches", async (nodeModels) =>
             {
                 await cacheConnectionPool.PopulatePoolAsync(nodeModels);
+                isPopulated = true;
             });
 
             masterConnection.On<Guid>("CacheDisconnected", async (id) =>
             {
-                Console.WriteLine("Cache disconnected {0}", id);
+                //Console.WriteLine("Cache disconnected {0}", id);
                 await cacheConnectionPool.RemoveConnection(id);
             });
 
             masterConnection.On<string>("CacheConnected", async (url) =>
             {
-                Console.WriteLine("Cache connected {0}", url);
+                //Console.WriteLine("Cache connected {0}", url);
                 await cacheConnectionPool.AddConnectionAsync(url);
             });
 
             masterConnection.StartAsync().Wait();
-            this.httpClientFactory = httpClientFactory;
-            this.cacheConnectionPool = cacheConnectionPool;
+
+            while (!isPopulated) 
+            {
+                Thread.Sleep(500);
+            }
         }
 
         public Task AddToHashMapAsync<T>(string key, string hashKey, T value)

@@ -4,6 +4,7 @@ using HmServiceCache.Client.Abstractions;
 using HmServiceCache.Client.Extensions;
 using HmServiceCache.Client.Models;
 using HmServiceCache.Client.RetryPolicies;
+using HmServiceCache.ClientConsoleApp.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,8 +21,8 @@ namespace HmServiceCache.ClientConsoleApp
             Console.ReadLine();
 
             //TestMasterConnection().Wait();
-            //RunTestAppAsync().Wait();
-            StartCliAsync().GetAwaiter().GetResult();
+            RunTestAppAsync().GetAwaiter().GetResult();
+            //StartCliAsync().GetAwaiter().GetResult();
 
             Console.WriteLine("END OF PROCESS");
             Console.WriteLine("Press enter to close");
@@ -30,12 +31,15 @@ namespace HmServiceCache.ClientConsoleApp
 
         private static async Task TestMasterConnection()
         {
-            Console.WriteLine("Testing master connection");
             var retryPolicy = new ForeverRetryPolicy(TimeSpan.FromMilliseconds(100));
+            const string url = "http://localhost:15000";
+
+            Console.WriteLine("Testing master connection");
             var connection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:15000" + $"/nodehub", opt =>
+                .WithUrl(url + $"/nodehub", opt =>
                 {
-                    opt.Headers.Add("AccessUri", "http://localhost:15000");
+                    opt.Headers.Add("AccessUri", url);
+                    opt.Headers.Add("AccessUriInternal", url);
                     opt.Headers.Add("Id", Guid.NewGuid().ToString());
                 })
                 .WithAutomaticReconnect(retryPolicy)
@@ -49,7 +53,7 @@ namespace HmServiceCache.ClientConsoleApp
             Console.WriteLine("Testing master connection");
 
             var connection1 = new HubConnectionBuilder()
-             .WithUrl("http://localhost:15000" + "/clienthub")
+             .WithUrl(url + "/clienthub")
              .AddMessagePackProtocol()
              .WithAutomaticReconnect(retryPolicy)
              .Build();
@@ -65,7 +69,9 @@ namespace HmServiceCache.ClientConsoleApp
             cache = StartCache();
             Console.WriteLine("Cache created");
 
-            await TestListAsync();
+
+            await StressTest.StartAsync(cache);
+            //await TestListAsync();
         }
 
         private static IHmServiceCache StartCache()
